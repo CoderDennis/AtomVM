@@ -116,6 +116,7 @@ compile_erlang(test_eth)
 compile_erlang(test_eth_teardown)
 compile_erlang(test_no_line_info_stacktrace)
 compile_erlang(test_nvs)
+compile_erlang(test_pcnt)
 compile_erlang(test_rtc_slow)
 compile_erlang(test_select)
 compile_erlang(test_socket)
@@ -150,6 +151,7 @@ set(erlang_test_beams
     test_eth_teardown.beam
     test_no_line_info_stacktrace.beam
     test_nvs.beam
+    test_pcnt.beam
     test_rtc_slow.beam
     test_select.beam
     test_socket.beam

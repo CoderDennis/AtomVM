@@ -26,6 +26,7 @@ set(AVM_BUILTIN_COMPONENT_SRCS
     "ledc_nif.c"
     "network_driver.c"
     "nvs_nif.c"
+    "pcnt_nif.c"
     "rtc_slow_nif.c"
     "socket_driver.c"
     "spi_driver.c"
@@ -65,6 +66,13 @@ idf_component_register(
 if(CONFIG_AVM_ENABLE_DAC_NIF)
     if(IDF_VERSION_MAJOR GREATER_EQUAL 6 OR (IDF_VERSION_MAJOR EQUAL 5 AND IDF_VERSION_MINOR GREATER_EQUAL 3))
         target_link_libraries(${COMPONENT_LIB} PRIVATE idf::esp_driver_dac)
+    endif()
+endif()
+
+# Since esp-idf 5.3 the pulse counter driver lives in its own component
+if(CONFIG_AVM_ENABLE_PCNT_NIFS)
+    if(IDF_VERSION_MAJOR GREATER_EQUAL 6 OR (IDF_VERSION_MAJOR EQUAL 5 AND IDF_VERSION_MINOR GREATER_EQUAL 3))
+        target_link_libraries(${COMPONENT_LIB} PRIVATE idf::esp_driver_pcnt)
     endif()
 endif()
 

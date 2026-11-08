@@ -29,6 +29,7 @@ set(ERLANG_MODULES
     gpio
     i2c
     ledc
+    pcnt
     spi
     uart
     usb_cdc

@@ -61,6 +61,11 @@ config AVM_ENABLE_LEDC_NIFS
     bool "Enable LEDC NIFs"
     default y
 
+config AVM_ENABLE_PCNT_NIFS
+    bool "Enable PCNT (pulse counter) NIFs"
+    depends on SOC_PCNT_SUPPORTED
+    default y
+
 config AVM_ENABLE_NVS_NIFS
     bool "Enable NVS NIFs"
     default y

@@ -734,6 +734,15 @@ TEST_CASE("test_eth_teardown", "[test_run]")
 }
 #endif
 
+// Drives GPIOs and counts the edges in hardware: not run on QEMU, like SPI.
+#if CONFIG_AVM_ENABLE_PCNT_NIFS && !CONFIG_ETH_USE_OPENETH
+TEST_CASE("test_pcnt", "[test_run]")
+{
+    term ret_value = avm_test_case("test_pcnt.beam");
+    TEST_ASSERT(ret_value == OK_ATOM);
+}
+#endif
+
 TEST_CASE("test_rtc_slow", "[test_run]")
 {
     term ret_value = avm_test_case("test_rtc_slow.beam");

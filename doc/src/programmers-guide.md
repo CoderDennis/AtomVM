@@ -46,6 +46,7 @@ In addition, several features are supported specifically for integration with mi
   * [SPI](#spi) interface
   * [UART](#uart) interface
   * [LEDC](#led-control) (PWM)
+  * [PCNT](#pulse-counter-encoders) (pulse and encoder counting)
   * [non-volatile storage](#non-volatile-storage) (NVS)
   * [RTC](#rtc-memory) storage
   * [restart and sleep](#restart-and-sleep)
@@ -2117,6 +2118,38 @@ TargetDuty = 16000.
 FadeMs = 5000.
 ok = ledc:set_fade_with_time(SpeedMode, Channel, TargetDuty, FadeMs).
 ```
+
+### Pulse Counter (encoders)
+
+The pulse counter (PCNT) counts edges on GPIO pins in hardware, so it keeps up with signals far faster than [GPIO interrupts](#gpio) can, such as the quadrature encoder on a DC gear motor. It is available on the ESP32, ESP32-S2, ESP32-S3, ESP32-C5, ESP32-C6, ESP32-H2 and ESP32-P4, but not on the ESP32-C2 or ESP32-C3.
+
+The PCNT API is encapsulated in the [`pcnt` module](./apidocs/erlang/eavmlib/pcnt.md) (`PCNT` in Elixir), and follows the IDF SDK [Pulse Counter API](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/pcnt.html). Configurations can be proplists or maps.
+
+For a quadrature (A/B) encoder, `pcnt:new_encoder/3` returns a started unit that counts every edge on both pins (4 counts per encoder cycle), up when A leads B and down when B leads A:
+
+```erlang
+{ok, Encoder} = pcnt:new_encoder(PinA, PinB, [{glitch_filter_ns, 1000}]),
+...
+{ok, Count} = pcnt:get_count(Encoder).
+```
+
+The hardware counter is 16 bits wide. `new_encoder/3` turns on `accum_count`, so the driver keeps a running total and `get_count/1` keeps counting past the hardware limits.
+
+For other uses, configure a unit and its channels yourself. A unit has up to 2 channels. Each channel has an edge GPIO, whose rising and falling edges `increase`, `decrease` or `hold` the count, and an optional level GPIO, whose high and low levels `keep`, `inverse` or `hold` that action. This counts rising edges on one pin:
+
+```erlang
+{ok, Unit} = pcnt:new_unit(#{low_limit => -1000, high_limit => 1000, accum_count => true}),
+ok = pcnt:new_channel(Unit, #{edge_gpio => Pin, pos_edge => increase, neg_edge => hold}),
+ok = pcnt:set_glitch_filter(Unit, 1000),
+ok = pcnt:enable(Unit),
+ok = pcnt:start(Unit),
+...
+{ok, Count} = pcnt:get_count(Unit).
+```
+
+Channels and the glitch filter must be set before `pcnt:enable/1`. A unit is freed, along with its hardware, when it is garbage collected, or right away with `pcnt:del_unit/1`. The driver enables the internal pull-up on the pins it uses.
+
+The PCNT NIFs can be left out of the build with `CONFIG_AVM_ENABLE_PCNT_NIFS=n`.
 
 ## Protocols
 

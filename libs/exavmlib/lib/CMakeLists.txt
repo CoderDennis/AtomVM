@@ -33,6 +33,7 @@ set(ELIXIR_MODULES
     I2C
     Integer
     LEDC
+    PCNT
     Access
     Enum
     Enumerable
